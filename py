@@ -16,6 +16,7 @@ collision_distance = 27
 # Initialize Pygame
 pygame.init()
 
+# Screen and Background
 screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load('background.png')
 pygame.display.set_caption("Space Invaders")
@@ -48,7 +49,7 @@ bulletImg = pygame.image.load('bullet.png')
 bulletx = 0
 bullety = playery
 bullety_change = 10
-bullet_state = "ready"  # "ready" - You can't see the bullet, "fire" - bullet is moving
+bullet_state = "ready"  # "ready" = can't see bullet; "fire" = bullet moving
 
 # Score
 score_value = 0
@@ -58,36 +59,42 @@ texty = 10
 
 # Game Over
 over_font = pygame.font.Font('freesansbold.ttf', 64)
+player_visible = True
 
-
+# Functions
 def show_score(x, y):
     score = font.render("Score: " + str(score_value), True, (255, 255, 255))
     screen.blit(score, (x, y))
-
 
 def game_over_text():
     over_text = over_font.render("GAME OVER", True, (255, 255, 255))
     screen.blit(over_text, (200, 250))
 
+def trigger_game_over():
+    global player_visible
+    player_visible = False
+    for j in range(num_of_enemies):
+        enemyy[j] = 2000  # move enemies off screen
+    game_over_text()
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
-
 def enemy(x, y, i):
     screen.blit(enemy_image[i], (x, y))
-
 
 def fire_bullet(x, y):
     global bullet_state
     bullet_state = "fire"
     screen.blit(bulletImg, (x + 16, y + 10))
 
-
 def is_collision(enemy_x, enemy_y, bullet_x, bullet_y):
     distance = math.sqrt((enemy_x - bullet_x) ** 2 + (enemy_y - bullet_y) ** 2)
     return distance < collision_distance
 
+def is_player_collision(player_x, player_y, enemy_x, enemy_y):
+    distance = math.sqrt((player_x - enemy_x) ** 2 + (player_y - enemy_y) ** 2)
+    return distance < collision_distance
 
 # Game Loop
 running = True
@@ -114,16 +121,18 @@ while running:
             if event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
                 playerx_change = 0
 
-    # Player Movement
+    # Player movement
     playerx += playerx_change
-    playerx = max(0, min(playerx, screen_width - 64))  # Player boundaries
+    playerx = max(0, min(playerx, screen_width - 64))  # keep within screen
 
-    # Enemy Movement
+    # Enemy movement
     for i in range(num_of_enemies):
         if enemyy[i] > 340:
-            for j in range(num_of_enemies):
-                enemyy[j] = 2000
-            game_over_text()
+            trigger_game_over()
+            break
+
+        if is_player_collision(playerx, playery, enemyx[i], enemyy[i]):
+            trigger_game_over()
             break
 
         enemyx[i] += enemyx_change[i]
@@ -131,7 +140,7 @@ while running:
             enemyx_change[i] *= -1
             enemyy[i] += enemyy_change[i]
 
-        # Collision
+        # Collision with bullet
         if is_collision(enemyx[i], enemyy[i], bulletx, bullety):
             bullety = playery
             bullet_state = "ready"
@@ -141,7 +150,7 @@ while running:
 
         enemy(enemyx[i], enemyy[i], i)
 
-    # Bullet Movement
+    # Bullet movement
     if bullet_state == "fire":
         fire_bullet(bulletx, bullety)
         bullety -= bullety_change
@@ -150,6 +159,10 @@ while running:
         bullety = playery
         bullet_state = "ready"
 
-    player(playerx, playery)
+    # Draw player only if visible
+    if player_visible:
+        player(playerx, playery)
+
+    # Show score and update display
     show_score(textx, texty)
     pygame.display.update()
