@@ -19,7 +19,7 @@ def display():
     text_box.insert(tk.END, greet)
     text_box.insert(tk.END, message)
 
-btn = tk.Button(root, text="Begin", command=display, height=1, bg="#1261A0", fg='white')
+btn = tk.Button(root, text="Click me", command=display, height=1, bg="#1261A0", fg='white')
 
 bl.pack()
 name_lbl.pack()
