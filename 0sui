@@ -1,0 +1,13 @@
+import pandas as pd
+
+data = {
+    'Name': ['Riya', 'Amit', 'Sneha', 'Karan', 'Pooja'],
+    'Score': [85, 90, 78, 92, 88],
+    'Age': [19, 20, 18, 21, 19],
+    'City': ['Delhi', 'Mumbai', 'Pune', 'Delhi', 'Chennai']
+}
+
+df = pd.DataFrame(data)
+
+print("Original Data:")
+print(df)
