@@ -1,0 +1,13 @@
+import matplotlib.pyplot as plt, pandas as pd, numpy as np #Line 1
+subjects = ['Math', 'Science', 'History', 'English']; student_names = ['Abhijay', 'Krish', 'Pratik', 'Ronith', 'Srinivas']; test_labels = ['T1','T2','T3','T4','T5']; alice_marks = [70,75,80,85,90] 
+df = pd.DataFrame({'Student': student_names, 'Math_Marks': [85, 72, 90, 65, 78], 'Science_Marks': [78, 88, 82, 70, 92], 'History_Marks': [60, 75, 80, 68, 70], 'English_Marks': [92, 80, 85, 75, 88]}) #Line 3
+for s in subjects: df[f'{s}_Percent'] = df[f'{s}_Marks'] #Line 4
+MARKS_MIN, MARKS_MAX = 0, 100 #Line 5
+def p(pt, d, xl, t, s=None, sub=None): # Plotter function #Line 6
+    plt.figure(figsize=(10,6)); plt.title(t); plt.xlabel('X-axis'); plt.ylabel('Y-axis'); plt.ylim(MARKS_MIN,MARKS_MAX); plt.grid(True,ls='--',alpha=0.7) #Line 7
+    if pt == 0: plt.bar(xl, d, label='Score'); avg=np.mean(d); plt.axhline(avg,color='red',ls='--',label=f'Avg: {avg:.2f}') #Line 8
+    elif pt == 1: plt.plot(xl, d, marker='o', label=f'{s}\'s Score'); avg=np.mean(d); plt.axhline(avg,color='red',ls='--',label=f'{s}\'s Avg: {avg:.2f}') #Line 9
+    elif pt == 2: pct=[d[f'{sb}_Percent']for sb in sub];plt.bar(sub,pct);avg=np.mean(pct);plt.axhline(avg,color='red',ls='--',label=f'Avg: {avg:.2f}') #Line 10
+    elif pt == 3: [plt.plot(sub, [r[f'{sb}_Percent']for sb in sub], marker='o', label=r['Student']) for _,r in d.iterrows()]; plt.plot(sub, [d[f'{sb}_Percent'].mean() for sb in sub], color='red', ls='--', marker='X', label='Class Avg') #Line 11
+    plt.legend(); plt.tight_layout(); plt.show() #Line 12
+p(0, df['Math_Marks'], df['Student'], "Student Math Marks"); p(1, alice_marks, test_labels, "Alice's Test Progress", "Alice") #Line 13
